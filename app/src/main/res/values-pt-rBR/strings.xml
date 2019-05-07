@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">LibWallet</string>
+    <string name="welcome_text">Explore suas bibliotecas ;)</string>
+    <string name="search_placeholder">Comece a explorar...</string>
+    <string name="label_libraries">Bibliotecas</string>
+    <string name="label_features">Funcionalidades</string>
+    <string name="label_languages">Linguagens</string>
+    <string name="label_new_library">Nova biblioteca</string>
+    <string name="label_preferences">Preferências</string>
+    <string name="label_about">Sobre</string>
+    <string name="instructions_create_lib">Insira as informações sobre sua nova biblioteca.</string>
+    <string name="instructions_edit_lib">Altere as informações da biblioteca e pressione salvar.</string>
+    <string name="label_name">Nome</string>
+    <string name="label_language">Linguagem</string>
+    <string name="label_details">Detalhes</string>
+    <string name="label_repositories">Repositórios</string>
+    <string name="button_text_save">SALVAR</string>
+    <string name="button_text_details">DETALHES</string>
+    <string name="label_edit">Editar</string>
+    <string name="label_delete">Excluir</string>
+    <string name="button_text_close">FECHAR</string>
+    <string name="label_no_details">Sem detalhes</string>
+    <string name="label_no_repositories">Sem repositórios</string>
+    <string name="app_description">Um app móvel para guardar as suas bibliotecas de desenvolvimento favoritas.</string>
+    <string name="label_version">Versão</string>
+    <string name="label_author_by">Por</string>
+    <string name="label_home_preferences">Preferências da tela inicial</string>
+    <string name="label_show_counters">Mostrar contadores</string>
+</resources>

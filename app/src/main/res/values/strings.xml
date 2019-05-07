@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name" translatable="false">LibWallet</string>
+    <string name="welcome_text">Explore your libraries ;)</string>
+    <string name="search_placeholder">Start exploring...</string>
+    <string name="label_libraries">Libraries</string>
+    <string name="label_features">Features</string>
+    <string name="label_languages">Languages</string>
+    <string name="label_new_library">New library</string>
+    <string name="label_preferences">Preferences</string>
+    <string name="label_about">About</string>
+    <string name="instructions_create_lib">Insert the information about your new library.</string>
+    <string name="instructions_edit_lib">Change the library information and then press save.</string>
+    <string name="label_name">Name</string>
+    <string name="label_language">Language</string>
+    <string name="label_details">Details</string>
+    <string name="label_repositories">Repositories</string>
+    <string name="button_text_save">SAVE</string>
+    <string name="button_text_details">DETAILS</string>
+    <string name="label_edit">Edit</string>
+    <string name="label_delete">Delete</string>
+    <string name="button_text_close">CLOSE</string>
+    <string name="label_no_details">No details</string>
+    <string name="label_no_repositories">No repositories</string>
+    <string name="app_description">A mobile App for holding your favorites development libraries.</string>
+    <string name="label_version">Version</string>
+    <string name="label_author_by">By</string>
+    <string name="label_home_preferences">Home preferences</string>
+    <string name="label_show_counters">Show counters</string>
+</resources>

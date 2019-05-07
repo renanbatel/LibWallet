@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/optionNewLibrary"
+        android:title="@string/label_new_library" />
+    <item
+        android:id="@+id/optionPreferences"
+        android:title="@string/label_preferences" />
+    <item
+        android:id="@+id/optionAbout"
+        android:title="@string/label_about" />
+</menu>
