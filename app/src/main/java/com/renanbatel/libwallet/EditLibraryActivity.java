@@ -5,12 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.renanbatel.libwallet.models.Feature;
 import com.renanbatel.libwallet.models.Library;
 import com.renanbatel.libwallet.resources.AlterLibraryActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditLibraryActivity extends AlterLibraryActivity {
 
     private Library library;
+    private List<Feature> tempNewFeatures;
+    private List<Feature> tempDeleteFeatures;
 
     @Override
     protected void handleFormSubmission(View view) {
@@ -24,6 +30,17 @@ public class EditLibraryActivity extends AlterLibraryActivity {
             this.fieldRepositories.getText().toString()
         );
 
+        for ( int i = 0; i < this.tempNewFeatures.size(); i++ ) {
+            Feature feature = this.tempNewFeatures.get( i );
+
+            this.libWalletDatabase.featureDAO().insert( feature );
+        }
+        for ( int i = 0; i < this.tempDeleteFeatures.size(); i++ ) {
+            Feature feature = this.tempDeleteFeatures.get( i );
+
+            this.libWalletDatabase.featureDAO().delete( feature );
+        }
+
         intent.putExtra( LIBRARY, library );
         setResult( Activity.RESULT_OK, intent );
         finish();
@@ -31,10 +48,17 @@ public class EditLibraryActivity extends AlterLibraryActivity {
 
     @Override
     protected void setupForm() {
+
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        this.library = bundle.getParcelable( LIBRARY );
+        this.tempNewFeatures    = new ArrayList<>();
+        this.tempDeleteFeatures = new ArrayList<>();
+        this.library            = bundle.getParcelable( LIBRARY );
+
+        this.features.addAll( this.libWalletDatabase.featureDAO().getAllFromLibrary( this.library.getId() ) );
+
+        this.featuresAdapter.notifyDataSetChanged();
 
         this.labelInstructions.setText( R.string.instructions_edit_lib );
         this.fieldName.setText( this.library.getName() );
@@ -42,6 +66,22 @@ public class EditLibraryActivity extends AlterLibraryActivity {
         this.fieldFeatures.setText( this.library.getFeatures() );
         this.fieldDetails.setText( this.library.getDetails() );
         this.fieldRepositories.setText( this.library.getRepositories() );
+    }
+
+    @Override
+    protected void addFeature() {
+        Feature feature = new Feature( this.fieldFeatures.getText().toString(), this.library.getId() );
+
+        this.tempNewFeatures.add( feature );
+        this.addFeature( feature );
+    }
+
+    @Override
+    protected void deleteFeature(int featureSelectedPosition) {
+        Feature feature = this.features.get( featureSelectedPosition );
+
+        this.tempDeleteFeatures.add( feature );
+        this.removeFeature( featureSelectedPosition );
     }
 
     @Override

@@ -26,4 +26,9 @@
     <string name="label_author_by">Por</string>
     <string name="label_home_preferences">Preferências da tela inicial</string>
     <string name="label_show_counters">Mostrar contadores</string>
+    <string name="yes_label">Sim</string>
+    <string name="no_label">Nao</string>
+    <string name="delete_library_warning">Voce realmente quer apagar a biblioteca?</string>
+    <string name="label_view">Ver</string>
+    <string name="label_counters">Contadores</string>
 </resources>

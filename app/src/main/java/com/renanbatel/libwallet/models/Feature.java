@@ -3,6 +3,8 @@ package com.renanbatel.libwallet.models;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 
 @Entity(
     tableName = "features",
@@ -17,6 +19,7 @@ import android.arch.persistence.room.ForeignKey;
 )
 public class Feature {
 
+    @PrimaryKey( autoGenerate = true )
     private Long id;
     private String title;
     @ColumnInfo( index = true )
@@ -30,6 +33,22 @@ public class Feature {
         this.id        = id;
         this.title     = title;
         this.libraryId = libraryId;
+    }
+
+    @Ignore
+    public Feature(
+        String title,
+        Long libraryId
+    ) {
+        this.title     = title;
+        this.libraryId = libraryId;
+    }
+
+    @Ignore
+    public Feature(
+        String title
+    ) {
+        this.title = title;
     }
 
     public Long getId() {
