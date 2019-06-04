@@ -9,8 +9,10 @@ import com.renanbatel.libwallet.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
+    protected Toolbar toolbar;
+
     protected void setupToolbar( boolean setUpButton ) {
-        Toolbar toolbar = findViewById( R.id.toolbar );
+        this.toolbar = findViewById( R.id.toolbar );
 
         setSupportActionBar( toolbar );
 

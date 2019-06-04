@@ -16,9 +16,14 @@ public class LibrariesAdapter extends RecyclerView.Adapter<LibrariesAdapter.Libr
 
     private List<Library> libraries;
     private OnItemClickListener onItemClickListener;
+    private OnItemLongClickListener onItemLongClickListener;
 
     public interface OnItemClickListener {
         void onItemClick( int position );
+    }
+
+    public interface OnItemLongClickListener {
+        boolean onItemLongClick( int position, View view );
     }
 
     public static class LibrariesViewHolder extends RecyclerView.ViewHolder {
@@ -26,7 +31,11 @@ public class LibrariesAdapter extends RecyclerView.Adapter<LibrariesAdapter.Libr
         public TextView cardLabelName;
         public TextView cardLabelFeatures;
 
-        public LibrariesViewHolder(@NonNull View itemView, final OnItemClickListener onItemClickListener ) {
+        public LibrariesViewHolder(
+            @NonNull View itemView,
+            final OnItemClickListener onItemClickListener,
+            final OnItemLongClickListener onItemLongClickListener
+        ) {
             super( itemView );
 
             this.cardLabelCode     = itemView.findViewById( R.id.cardLabelCode );
@@ -45,6 +54,20 @@ public class LibrariesAdapter extends RecyclerView.Adapter<LibrariesAdapter.Libr
                     }
                 }
             } );
+            itemView.setOnLongClickListener( new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick( View v ) {
+                    if ( onItemLongClickListener != null ) {
+                        int position = getAdapterPosition();
+
+                        if ( position != RecyclerView.NO_POSITION ) {
+                            onItemLongClickListener.onItemLongClick( position, v );
+                        }
+                    }
+
+                    return true;
+                }
+            });
         }
     }
 
@@ -56,6 +79,10 @@ public class LibrariesAdapter extends RecyclerView.Adapter<LibrariesAdapter.Libr
         this.onItemClickListener = onItemClickListener;
     }
 
+    public void setOnItemLongClickListener( OnItemLongClickListener onItemLongClickListener ) {
+        this.onItemLongClickListener = onItemLongClickListener;
+    }
+
     @NonNull
     @Override
     public LibrariesViewHolder onCreateViewHolder( @NonNull ViewGroup viewGroup, int i ) {
@@ -63,7 +90,7 @@ public class LibrariesAdapter extends RecyclerView.Adapter<LibrariesAdapter.Libr
             .from( viewGroup.getContext() )
             .inflate(  R.layout.card_library, viewGroup, false );
 
-        return new LibrariesViewHolder( view, this.onItemClickListener );
+        return new LibrariesViewHolder( view, this.onItemClickListener, this.onItemLongClickListener );
     }
 
     @Override

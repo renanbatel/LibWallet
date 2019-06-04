@@ -2,25 +2,31 @@ package com.renanbatel.libwallet;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.constraint.ConstraintSet;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
+import android.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.renanbatel.libwallet.adapters.LibrariesAdapter;
+import com.renanbatel.libwallet.daos.LibWalletDatabase;
 import com.renanbatel.libwallet.models.Library;
 import com.renanbatel.libwallet.resources.BaseActivity;
+import com.renanbatel.libwallet.util.GUI;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity {
@@ -28,10 +34,15 @@ public class MainActivity extends BaseActivity {
     private static final int LIBRARY_CREATE = 1;
     private static final int LIBRARY_VIEW = 2;
 
+    private LibWalletDatabase libWalletDatabase;
     private List<Library> libraries;
     private RecyclerView librariesRecyclerView;
     private LibrariesAdapter librariesAdapter;
     private RecyclerView.LayoutManager librariesLayoutManager;
+    private ActionMode libraryActionMode;
+    private View librarySelectedView;
+    private int librarySelectedPosition;
+    private CheckBox optionShowCounters;
     private EditText search;
     private TextView countLibraries;
     private TextView countFeatures;
@@ -97,10 +108,43 @@ public class MainActivity extends BaseActivity {
         this.librariesAdapter.notifyItemChanged( position );
     }
 
+    protected void updateOptionShowCounters() {
+        if ( this.optionShowCounters != null ) {
+            SharedPreferences sharedPreferences = this.getSharedPreferences(
+                PreferencesActivity.FILE_KEY,
+                Context.MODE_PRIVATE
+            );
+            Boolean showCounters      = sharedPreferences.getBoolean( PreferencesActivity.SHOW_COUNTERS, true );
+
+            this.optionShowCounters.setChecked( showCounters );
+        }
+    }
+
     protected void removeLibrary( int position ) {
         this.libraries.remove( position );
         this.librariesAdapter.notifyItemRemoved( position );
         this.updateCounters();
+    }
+
+    protected void preRemoveLibrary( final int position, final ActionMode actionMode ) {
+        GUI.confirmDialog(
+            this,
+            getResources().getString( R.string.delete_library_warning ),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick( DialogInterface dialog, int which ) {
+                    switch( which ) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            Library library = libraries.get( position );
+
+                            libWalletDatabase.libraryDao().delete( library );
+                            removeLibrary( position );
+                            actionMode.finish();
+                            break;
+                    }
+                }
+            }
+        );
     }
 
     protected void setupSearch() {
@@ -108,42 +152,33 @@ public class MainActivity extends BaseActivity {
     }
 
     protected void setupLibrariesRecyclerView() {
-        libraries = new ArrayList<>();
+        libraries = this.libWalletDatabase.libraryDao().list();
 
         this.librariesRecyclerView  = findViewById( R.id.librariesRecyclerView );
         this.librariesLayoutManager = new LinearLayoutManager( this );
         this.librariesAdapter       = new LibrariesAdapter( libraries );
 
-        // Example data
-        libraries.add( new Library(
-            new Long( 1 ),
-            "facebook/react",
-            "JS",
-            "JavaScript components, UI development, Virtual DOM",
-            "Really good performance thanks to VDOM",
-            "https://github.com/facebook/react"
-        ) );
-        libraries.add( new Library(
-            new Long( 2 ),
-            "reduxjs/redux",
-            "JS",
-            "Component State Container",
-            "Good for using with React",
-            ""
-        ) );
-        libraries.add( new Library(
-            new Long( 2 ),
-            "sebastianbergmann/phpunit",
-            "PHP",
-            "Unit test",
-            "",
-            "https://github.com/sebastianbergmann/phpunit"
-        ) );
-
         this.librariesAdapter.setOnItemClickListener(new LibrariesAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 openViewLibraryActivity( position );
+            }
+        });
+        this.librariesAdapter.setOnItemLongClickListener(new LibrariesAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick( int position, View view ) {
+                if ( libraryActionMode != null ) {
+
+                    return false;
+                } else {
+                    libraryActionMode       = toolbar.startActionMode( libraryActionModeCallback );
+                    librarySelectedView     = view;
+                    librarySelectedPosition = position;
+
+                    view.setBackgroundColor( Color.LTGRAY );
+
+                    return true;
+                }
             }
         });
         this.librariesRecyclerView.setHasFixedSize( false );
@@ -179,6 +214,9 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        this.libWalletDatabase = LibWalletDatabase.getDatabase( this );
+
         this.setupToolbar( false );
         this.setupSearch();
         this.setupLibrariesRecyclerView();
@@ -190,13 +228,35 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         this.updateCounters();
+        this.updateOptionShowCounters();
     }
 
     @Override
     public boolean onCreateOptionsMenu( Menu menu ) {
+        final SharedPreferences sharedPreferences = this.getSharedPreferences(
+            PreferencesActivity.FILE_KEY,
+            Context.MODE_PRIVATE
+        );
+
+        Boolean showCounters      = sharedPreferences.getBoolean( PreferencesActivity.SHOW_COUNTERS, true );
         MenuInflater menuInflater = getMenuInflater();
 
         menuInflater.inflate( R.menu.menu_main, menu );
+
+        this.optionShowCounters = ( CheckBox ) menu.findItem( R.id.optionShowCounters ).getActionView();
+
+        this.optionShowCounters.setText( getResources().getString( R.string.label_counters ) );
+        this.optionShowCounters.setChecked( showCounters );
+        this.optionShowCounters.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick( View v ) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                editor.putBoolean( PreferencesActivity.SHOW_COUNTERS, optionShowCounters.isChecked() );
+                editor.commit();
+                updateCounters();
+            }
+        });
 
         return true;
     }
@@ -233,7 +293,8 @@ public class MainActivity extends BaseActivity {
             int action    = bundle.getInt( ViewLibraryActivity.ACTION );
 
             if ( action == ViewLibraryActivity.DELETE ) {
-                int position = bundle.getInt( ViewLibraryActivity.POSITION );
+                int position    = bundle.getInt( ViewLibraryActivity.POSITION );
+                Library library = this.libraries.get( position );
 
                 this.removeLibrary( position );
             } else if ( action == ViewLibraryActivity.UPDATE ) {
@@ -244,4 +305,42 @@ public class MainActivity extends BaseActivity {
             }
         }
     }
+
+    private ActionMode.Callback libraryActionModeCallback = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            actionMode.getMenuInflater().inflate( R.menu.library_action_menu, menu );
+
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            switch ( menuItem.getItemId() ) {
+                case R.id.actionView:
+                    openViewLibraryActivity( librarySelectedPosition );
+                    actionMode.finish();
+                    return true;
+                case R.id.actionDelete:
+                    preRemoveLibrary( librarySelectedPosition, actionMode );
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+            librarySelectedView.setBackgroundColor( Color.WHITE );
+
+            librarySelectedView     = null;
+            libraryActionMode       = null;
+            librarySelectedPosition = -1;
+        }
+    };
 }

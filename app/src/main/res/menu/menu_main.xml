@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/optionNewLibrary"
@@ -10,4 +11,10 @@
     <item
         android:id="@+id/optionAbout"
         android:title="@string/label_about" />
+    <item
+        android:id="@+id/optionShowCounters"
+        android:checkable="true"
+        android:title="@string/label_counters"
+        app:actionViewClass="android.widget.CheckBox"
+        app:showAsAction="always" />
 </menu>

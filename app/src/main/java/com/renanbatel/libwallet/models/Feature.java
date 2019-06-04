@@ -1,16 +1,35 @@
 package com.renanbatel.libwallet.models;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+
+@Entity(
+    tableName = "features",
+    foreignKeys = {
+        @ForeignKey(
+            entity = Library.class,
+            parentColumns = "id",
+            childColumns = "libraryId",
+            onDelete = ForeignKey.CASCADE
+        )
+    }
+)
 public class Feature {
 
     private Long id;
     private String title;
+    @ColumnInfo( index = true )
+    private Long libraryId;
 
     public Feature(
         Long id,
-        String title
+        String title,
+        Long libraryId
     ) {
-        this.id    = id;
-        this.title = title;
+        this.id        = id;
+        this.title     = title;
+        this.libraryId = libraryId;
     }
 
     public Long getId() {
@@ -27,5 +46,13 @@ public class Feature {
 
     public void setTitle( String title ) {
         this.title = title;
+    }
+
+    public Long getLibraryId() {
+        return libraryId;
+    }
+
+    public void setLibraryId( Long libraryId ) {
+        this.libraryId = libraryId;
     }
 }

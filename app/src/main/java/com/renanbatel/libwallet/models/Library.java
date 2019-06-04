@@ -1,10 +1,18 @@
 package com.renanbatel.libwallet.models;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
+@Entity(
+    tableName = "libraries"
+)
 public class Library implements Parcelable {
 
+    @PrimaryKey( autoGenerate = true )
     private Long id;
     private String name;
     private String language; // TODO: List<Language>
@@ -25,6 +33,7 @@ public class Library implements Parcelable {
         }
     };
 
+
     public Library(
         Long id,
         String name,
@@ -41,12 +50,28 @@ public class Library implements Parcelable {
         this.repositories = repositories;
     }
 
+    @Ignore
+    public Library(
+        String name,
+        String language,
+        String features,
+        String details,
+        String repositories
+    ) {
+        this.setName( name );
+        this.setLanguage( language );
+        this.setFeatures( features );
+        this.setDetails( details );
+        this.setRepositories( repositories );
+    }
+
+    @Ignore
     public Library( Parcel parcel ) {
-        this.id = parcel.readLong();
-        this.name = parcel.readString();
-        this.language = parcel.readString();
-        this.features = parcel.readString();
-        this.details = parcel.readString();
+        this.id           = parcel.readLong();
+        this.name         = parcel.readString();
+        this.language     = parcel.readString();
+        this.features     = parcel.readString();
+        this.details      = parcel.readString();
         this.repositories = parcel.readString();
     }
 

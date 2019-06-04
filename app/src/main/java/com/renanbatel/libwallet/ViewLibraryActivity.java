@@ -1,6 +1,7 @@
 package com.renanbatel.libwallet;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,9 +11,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.renanbatel.libwallet.daos.LibWalletDatabase;
 import com.renanbatel.libwallet.dialogs.LibraryDetailsDialog;
 import com.renanbatel.libwallet.models.Library;
 import com.renanbatel.libwallet.resources.BaseActivity;
+import com.renanbatel.libwallet.util.GUI;
 
 public class ViewLibraryActivity extends BaseActivity {
 
@@ -25,6 +28,7 @@ public class ViewLibraryActivity extends BaseActivity {
     public static final int UPDATE = 1;
     public static final int DELETE = 2;
 
+    private LibWalletDatabase libWalletDatabase;
     private Library library;
     private Button buttonDetails;
     private TextView libraryName;
@@ -85,21 +89,38 @@ public class ViewLibraryActivity extends BaseActivity {
     }
 
     private void handleDelete() {
-        Intent intent       = getIntent();
-        Intent resultIntent = new Intent();
-        Bundle bundle       = intent.getExtras();
-        int position        = bundle.getInt( POSITION );
+        GUI.confirmDialog(
+            this,
+            getResources().getString( R.string.delete_library_warning ),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick( DialogInterface dialog, int which ) {
+                    switch( which ) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            Intent intent       = getIntent();
+                            Intent resultIntent = new Intent();
+                            Bundle bundle       = intent.getExtras();
+                            int position        = bundle.getInt( POSITION );
 
-        resultIntent.putExtra( POSITION, position );
-        resultIntent.putExtra( ACTION, DELETE );
-        setResult( Activity.RESULT_OK, resultIntent );
-        finish();
+                            libWalletDatabase.libraryDao().delete( library );
+                            resultIntent.putExtra( POSITION, position );
+                            resultIntent.putExtra( ACTION, DELETE );
+                            setResult( Activity.RESULT_OK, resultIntent );
+                            finish();
+                            break;
+                    }
+                }
+            }
+        );
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_library);
+
+        this.libWalletDatabase = LibWalletDatabase.getDatabase( this );
+
         this.setupToolbar( true );
         this.setupLibraryView();
     }
@@ -153,6 +174,7 @@ public class ViewLibraryActivity extends BaseActivity {
             this.library           = library;
             this.libraryHasUpdated = true;
 
+            this.libWalletDatabase.libraryDao().update( library );
             this.updateLibraryView();
         }
     }

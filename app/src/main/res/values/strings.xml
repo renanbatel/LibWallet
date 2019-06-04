@@ -26,4 +26,9 @@
     <string name="label_author_by">By</string>
     <string name="label_home_preferences">Home preferences</string>
     <string name="label_show_counters">Show counters</string>
+    <string name="yes_label">Yes</string>
+    <string name="no_label">No</string>
+    <string name="delete_library_warning">Do you really want to delete this library?</string>
+    <string name="label_view">View</string>
+    <string name="label_counters">Counters</string>
 </resources>

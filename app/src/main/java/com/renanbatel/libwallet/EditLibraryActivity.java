@@ -16,7 +16,7 @@ public class EditLibraryActivity extends AlterLibraryActivity {
     protected void handleFormSubmission(View view) {
         Intent intent   = new Intent();
         Library library = new Library(
-            new Long( ( int ) Math.random() ),
+            this.library.getId(),
             this.fieldName.getText().toString(),
             this.fieldLanguage.getText().toString(),
             this.fieldFeatures.getText().toString(),
